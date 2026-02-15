@@ -1,0 +1,39 @@
+---
+description: LangGraph + view — frontend patterns (streaming, state, UI)
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# LangGraph + View — Frontend
+
+Frontend code that displays or drives a LangGraph-backed flow. Keep the view layer decoupled from graph execution.
+
+## Consuming the graph
+
+- **Prefer streaming**: Consume graph output via a stream (e.g. SSE or WebSocket from your API). Use `streamMode: "updates"` for state deltas or `"values"` for full state after each step.
+- **Typed state**: Define TypeScript types (or Zod schemas) that match the graph state. Use them for streamed chunks and UI state.
+- **No graph in view**: Run the graph on the backend. The frontend calls your API and handles streamed events; do not import `@langchain/langgraph` in view code.
+
+## Patterns
+
+```typescript
+// ✅ GOOD — frontend consumes stream from API, typed state
+type GraphState = { topic: string; joke: string };
+
+for await (const chunk of eventStream) {
+  const update = chunk as Partial<GraphState>;
+  setState((s) => ({ ...s, ...update }));
+}
+```
+
+```typescript
+// ❌ BAD — importing and running the graph in the view
+import { StateGraph } from "@langchain/langgraph";
+const graph = new StateGraph(...).compile();
+```
+
+## UI concerns
+
+- Handle **loading** while the stream has not started or is in progress.
+- Support **partial state**: render whatever fields are available as updates arrive.
+- Surface **errors** from the stream or API and allow retry/cancel.

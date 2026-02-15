@@ -1,0 +1,62 @@
+---
+description: Python backend — PDF, Grafana, Kubernetes
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python Backend — PDF, Grafana, Kubernetes
+
+Вся бэкенд-логика (формирование PDF, планирование в Grafana, оркестрация в Kubernetes) пишется на Python.
+
+## PDF
+
+- Генерация/формирование PDF — использовать проверенные библиотеки: **reportlab** (низкоуровневый контроль) или **WeasyPrint** / **fpdf2** для HTML→PDF или простых документов.
+- Не хардкодить пути к шрифтам; выносить конфиг (шрифты, шаблоны) в настройки или env.
+- Для больших объёмов — потоковая запись или чанковая генерация, не держать весь PDF в памяти.
+
+```python
+# ✅ GOOD — явный выходной поток, конфигурируемые пути
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+
+def build_pdf(output_path: Path, template_opts: dict) -> None:
+    c = canvas.Canvas(str(output_path), pagesize=A4)
+    # ... draw
+    c.save()
+```
+
+## Grafana
+
+- Планирование дашбордов/алертов — через **Grafana API** (HTTP) или **grafana-api** (Python client). Декларировать дашборды как код (JSON/YAML), хранить в репозитории.
+- Не хранить пароли/токены в коде; использовать env или секреты (Kubernetes Secrets, .env).
+- Телеметрия и метрики для LangGraph/сервисов — экспорт в формате, совместимом с Grafana (Prometheus, Loki, etc.).
+
+```python
+# ✅ GOOD — конфиг и токен из окружения
+import os
+from grafana_api.grafana_face import GrafanaFace
+
+grafana = GrafanaFace(auth=os.environ["GRAFANA_API_KEY"], host=os.environ["GRAFANA_URL"])
+# создание/обновление дашборда из JSON
+```
+
+## Kubernetes
+
+- Взаимодействие с кластером — **kubernetes** (official Python client) или **kubectl** через subprocess только при необходимости; предпочитать client API для скриптов и автоматизации.
+- Манифесты — хранить как YAML в репозитории; применять через `kubectl apply -f` или API. Не зашивать namespace и имена окружений в код — параметризовать (env, CLI, ConfigMap).
+- Секреты — только через Kubernetes Secrets или внешний vault; не логировать и не коммитить.
+
+```python
+# ✅ GOOD — клиент API, namespace из конфига
+from kubernetes import client, config
+
+config.load_incluster_config()  # или load_kube_config() для локальной отладки
+v1 = client.CoreV1Api()
+ns = os.environ.get("NAMESPACE", "default")
+pods = v1.list_namespaced_pod(namespace=ns)
+```
+
+## Общее
+
+- Логирование — структурированное (JSON или единый формат), уровни INFO/WARNING/ERROR.
+- Зависимости — фиксировать в `requirements.txt` с версиями; виртуальное окружение для разработки и образов.
