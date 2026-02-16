@@ -17,7 +17,7 @@ class ProjectCreate(BaseModel):
     grafana_sources: Optional[List[dict]] = None
     k8s_config: Optional[dict] = None
     llm_type: str = "ollama"
-    llm_model: str = "qwen2.5vl:7b"
+    llm_model: str = "qwen2.5:7b"
     llm_api_key: Optional[str] = None
 
 
@@ -76,6 +76,7 @@ class ReportRead(BaseModel):
     test_id: int
     report_text: str
     pdf_path: Optional[str] = None
+    artifacts_used_snapshot: Optional[List[dict]] = None
     created_at: datetime
 
     class Config:

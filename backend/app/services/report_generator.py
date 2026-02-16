@@ -31,6 +31,7 @@ class ReportGeneratorService:
         test_id: int,
         title: str,
         meta: dict,
+        sources: str,
         table_rows: list[list[str]],
         good_points: str,
         bad_points: str,
@@ -39,6 +40,7 @@ class ReportGeneratorService:
     ) -> Path:
         """
         meta: project_name, test_type, version, time_range
+        sources: какие файлы использованы для отчёта
         table_rows: [["Pod", "Count", "Limits", "Requests"], ...]
         """
         path = self.reports_path / f"test_{test_id}_report.pdf"
@@ -61,6 +63,9 @@ class ReportGeneratorService:
         story.append(Paragraph(f"Тип теста: {meta.get('test_type', '—')}", style_b))
         story.append(Paragraph(f"Версия ПО: {meta.get('version', '—')}", style_b))
         story.append(Paragraph(f"Время тестирования: {meta.get('time_range', '—')}", style_b))
+        story.append(Spacer(1, 0.3 * cm))
+        story.append(Paragraph("Источники данных (файлы, на которых основан отчёт)", style_h))
+        story.append(Paragraph(sources or "—", style_b))
         story.append(Spacer(1, 0.5 * cm))
 
         if table_rows:

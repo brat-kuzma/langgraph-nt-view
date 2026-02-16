@@ -1,0 +1,167 @@
+# LangGraph NT View — примеры для REST Client (VS Code)
+# Запусти backend: ./scripts/run.sh
+# Нажми "Send Request" над нужным запросом или Ctrl+Alt+R (Cmd+Alt+R)
+
+@baseUrl = http://localhost:8000
+@projectId = 1
+@testId = 1
+
+### ========== Health ==========
+GET {{baseUrl}}/health
+
+### ========== Projects ==========
+GET {{baseUrl}}/api/projects/
+
+###
+POST {{baseUrl}}/api/projects/
+Content-Type: application/json
+
+{
+  "name": "Тестовый проект",
+  "description": "Описание проекта",
+  "llm_type": "ollama",
+  "llm_model": "qwen2.5:7b",
+  "llm_api_key": null
+}
+
+### С несколькими источниками Grafana и K8s (опционально)
+POST {{baseUrl}}/api/projects/
+Content-Type: application/json
+
+{
+  "name": "Проект с Grafana и K8s",
+  "grafana_sources": [
+    {"name": "business", "url": "https://grafana.example.com", "token": "YOUR_TOKEN"},
+    {"name": "k8s", "url": "https://grafana-k8s.example.com", "token": "YOUR_TOKEN"}
+  ],
+  "k8s_config": {
+    "server": "https://k8s.example.com",
+    "token": "YOUR_K8S_TOKEN"
+  },
+  "llm_type": "ollama",
+  "llm_model": "qwen2.5:7b"
+}
+
+###
+GET {{baseUrl}}/api/projects/{{projectId}}
+
+###
+PATCH {{baseUrl}}/api/projects/{{projectId}}
+Content-Type: application/json
+
+{
+  "name": "Обновлённое имя",
+  "llm_type": "ollama",
+  "llm_model": "qwen2.5:7b"
+}
+
+###
+DELETE {{baseUrl}}/api/projects/{{projectId}}
+
+### ========== Tests ==========
+GET {{baseUrl}}/api/tests/
+
+### Все тесты по проекту
+GET {{baseUrl}}/api/tests/?project_id={{projectId}}
+
+###
+POST {{baseUrl}}/api/tests/
+Content-Type: application/json
+
+{
+  "project_id": 1,
+  "test_type": "max_search",
+  "started_at": "2025-02-15T10:00:00",
+  "ended_at": "2025-02-15T12:00:00",
+  "system_prompt": "Система X, акцент на памяти и GC."
+}
+
+### Типы test_type: max_search | max_confirmation | reliability | destructive
+POST {{baseUrl}}/api/tests/
+Content-Type: application/json
+
+{
+  "project_id": 1,
+  "test_type": "reliability",
+  "system_prompt": "Промпт для агента о системе."
+}
+
+###
+GET {{baseUrl}}/api/tests/{{testId}}
+
+### Запуск анализа (агент LangGraph + LLM)
+POST {{baseUrl}}/api/tests/{{testId}}/run-analysis
+
+###
+DELETE {{baseUrl}}/api/tests/{{testId}}
+
+### ========== Artifacts ==========
+GET {{baseUrl}}/api/artifacts/test/{{testId}}
+
+### Загрузка артефакта (multipart). Файл backend/artifact.log или укажи свой путь.
+POST {{baseUrl}}/api/artifacts/test/{{testId}}/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="kind"
+
+custom_java_log
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="display_name"
+
+my-app-gc.log
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="artifact.log"
+Content-Type: text/plain
+
+< ./artifact.log
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Виды kind: custom_java_log | custom_gc | custom_thread_dump | custom_heap_dump | custom_jvm_opts | custom_jfr | custom_other
+
+### Загрузка артефакта (multipart). Файл backend/gc_with_problems.log или укажи свой путь.
+POST {{baseUrl}}/api/artifacts/test/{{testId}}/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="kind"
+
+custom_java_log
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="display_name"
+
+gc_with_problems.log
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="gc_with_problems.log"
+Content-Type: text/plain
+
+< ./gc_with_problems.log
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Виды kind: custom_java_log | custom_gc | custom_thread_dump | custom_heap_dump | custom_jvm_opts | custom_jfr | custom_other
+
+### Скачать все артефакты теста (ZIP)
+GET {{baseUrl}}/api/artifacts/download-all/{{testId}}
+
+### Удалить все артефакты теста
+DELETE {{baseUrl}}/api/artifacts/test/{{testId}}/artifacts
+
+### ========== Collect (Grafana / Kubernetes) ==========
+### Срезы дашборда Grafana за период (нужны grafana_sources в проекте)
+POST {{baseUrl}}/api/collect/test/{{testId}}/grafana?from_ts=2025-02-15T10:00:00&to_ts=2025-02-15T12:00:00&dashboard_uid=abc123&grafana_source_index=0
+
+### Собрать поды и логи Kubernetes за период
+POST {{baseUrl}}/api/collect/test/{{testId}}/kubernetes?from_ts=2025-02-15T10:00:00&to_ts=2025-02-15T12:00:00
+
+### С указанием namespace
+POST {{baseUrl}}/api/collect/test/{{testId}}/kubernetes?from_ts=2025-02-15T10:00:00&to_ts=2025-02-15T12:00:00&namespace=default
+
+### ========== Reports ==========
+### В ответе: report_text, pdf_path, artifacts_used_snapshot — список артефактов, на основе которых составлен отчёт (даже если артефакты потом удалили)
+GET {{baseUrl}}/api/reports/test/{{testId}}
+
+### Текст отчёта
+GET {{baseUrl}}/api/reports/test/{{testId}}/text
+
+### PDF отчёта (скачать)
+GET {{baseUrl}}/api/reports/test/{{testId}}/pdf

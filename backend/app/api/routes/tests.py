@@ -48,8 +48,8 @@ def get_test(test_id: int, db: Session = Depends(get_db)):
 def run_test_analysis(test_id: int, db: Session = Depends(get_db)):
     from app.services.analysis_runner import run_analysis_for_test
     try:
-        report = run_analysis_for_test(db, test_id)
-        return {"status": "done", "report_id": report.id}
+        report, artifacts_used = run_analysis_for_test(db, test_id)
+        return {"status": "done", "report_id": report.id, "artifacts_used": artifacts_used}
     except ValueError as e:
         raise HTTPException(404, str(e))
     except RuntimeError as e:

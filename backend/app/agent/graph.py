@@ -12,7 +12,7 @@ from app.config import settings
 
 def create_agent_graph(
     llm_type: str = "ollama",
-    llm_model: str = "qwen2.5vl:7b",
+    llm_model: str = "qwen2.5:7b",
     llm_api_key: Optional[str] = None,
     llm_base_url: Optional[str] = None,
 ):
@@ -38,14 +38,17 @@ def create_agent_graph(
 def run_analysis(
     test_meta: dict,
     artifact_contents: str,
+    artifact_labels: Optional[list] = None,
     system_prompt: Optional[str] = None,
+    max_artifact_chars: Optional[int] = None,
     llm_type: str = "ollama",
-    llm_model: str = "qwen2.5vl:7b",
+    llm_model: str = "qwen2.5:7b",
     llm_api_key: Optional[str] = None,
     llm_base_url: Optional[str] = None,
 ) -> dict:
     """
     Run agent and return final state with report_text and report_sections.
+    artifact_labels: список имён файлов (display_name), все должны быть учтены в отчёте.
     """
     graph = create_agent_graph(
         llm_type=llm_type,
@@ -56,7 +59,9 @@ def run_analysis(
     initial: AgentState = {
         "test_meta": test_meta,
         "artifact_contents": artifact_contents,
+        "artifact_labels": artifact_labels or [],
         "system_prompt": system_prompt,
+        "max_artifact_chars": max_artifact_chars,
     }
     config = {"configurable": {"thread_id": "run_once"}}
     final = None

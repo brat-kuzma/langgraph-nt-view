@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from sqlalchemy.orm import Session
 from pathlib import Path
 import zipfile
@@ -37,7 +37,7 @@ async def upload_artifact(
         raise HTTPException(404, "Test not found")
     content = await file.read()
     svc = ArtifactsService()
-    path, meta = svc.save_custom_artifact(
+    path_for_db, meta = svc.save_custom_artifact(
         test_id=test_id,
         kind=kind,
         content=content,
@@ -48,7 +48,7 @@ async def upload_artifact(
         test_id=test_id,
         kind=kind,
         display_name=display_name or file.filename,
-        file_path=str(path),
+        file_path=str(path_for_db),
         metadata_=meta,
     )
     db.add(art)
@@ -95,4 +95,4 @@ def delete_test_artifacts(test_id: int, db: Session = Depends(get_db)):
     svc = ArtifactsService()
     svc.delete_test_artifacts(test_id)
     db.commit()
-    return None
+    return Response(status_code=204)

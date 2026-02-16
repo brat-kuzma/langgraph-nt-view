@@ -7,7 +7,7 @@
 - **FastAPI** — API
 - **SQLite** по умолчанию / **PostgreSQL** по желанию
 - **LangGraph** — агент анализа
-- **LLM**: Ollama (qwen2.5vl:7b), GigaChat, OpenAI-совместимые
+- **LLM**: Ollama (qwen2.5:7b), GigaChat, OpenAI-совместимые
 - **Grafana API**, **Kubernetes client**, **ReportLab** (PDF)
 
 ---
@@ -32,7 +32,9 @@ cd backend
 
 Откроется **http://localhost:8000**. Документация API: **http://localhost:8000/docs**.
 
-Остановка: `Ctrl+C`.
+Примеры запросов для **REST Client** (VS Code): файл **`api.http`** в каталоге `backend/`. Открой его и нажми "Send Request" над нужным запросом.
+
+Остановка: `Ctrl+C` в терминале, где запущен сервер. Если порт 8000 занят: `./scripts/stop.sh`.
 
 ### Скрипты (папка `scripts/`)
 
@@ -41,6 +43,7 @@ cd backend
 | `install.sh` | Создать venv, установить зависимости, создать `.env` из примера |
 | `run.sh` | Запуск с перезагрузкой при изменении кода (разработка) |
 | `run-without-reload.sh` | Запуск без перезагрузки |
+| `stop.sh` | Остановить процесс на порту 8000 (если «Address already in use») |
 
 При запуске через скрипты используется `backend/.env` (в т.ч. SQLite), переменная `DATABASE_URL` из шелла не подставляется.
 
@@ -63,12 +66,9 @@ cd backend
 
 Минимальный сценарий (без Grafana/K8s):
 
-1. **POST /api/projects/** — тело: `{"name": "Тест", "llm_type": "ollama", "llm_model": "qwen2.5vl:7b"}`.
+1. **POST /api/projects/** — тело: `{"name": "Тест", "llm_type": "ollama", "llm_model": "qwen2.5:7b"}`.
 2. **POST /api/tests/** — тело: `{"project_id": 1, "test_type": "max_search"}`.
-3. **POST /api/artifacts/test/1/upload** — form: `kind=custom_java_log`, `file` = любой .log/.txt.
-4. **POST /api/tests/1/run-analysis** — нужна запущенная Ollama с моделью `qwen2.5vl:7b`.
-5. **GET /api/reports/test/1**, **/api/reports/test/1/pdf** — отчёт.
-
+3. **POST /api/artifacts/test/1/upload** — form: `kind=custom_java_log`, `file` = любой .log/.txt. 4. **POST /api/tests/1/run-analysis** — нужна запущенная Ollama с моделью `qwen2.5:7b`. 5. **GET /api/reports/test/1**, **/api/reports/test/1/pdf** — отчёт.
 ---
 
 ## Эндпоинты

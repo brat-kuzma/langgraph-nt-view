@@ -1,4 +1,4 @@
-"""LLM factory: Ollama (qwen2.5vl), GigaChat, OpenAI-compatible (cheap/free)."""
+"""LLM factory: Ollama (qwen2.5), GigaChat, OpenAI-compatible (cheap/free)."""
 from typing import Optional
 
 from langchain_core.language_models import BaseChatModel
@@ -19,7 +19,7 @@ def get_llm(
     if llm_type == LLMType.ollama.value:
         from langchain_community.chat_models import ChatOllama
         return ChatOllama(
-            model=model or "qwen2.5vl:7b",
+            model=model or "qwen2.5:7b",
             base_url=base_url or "http://localhost:11434",
             temperature=0.2,
         )

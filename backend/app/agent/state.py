@@ -8,7 +8,9 @@ class AgentState(TypedDict, total=False):
     # Input
     test_meta: dict
     artifact_contents: str
+    artifact_labels: Optional[list]
     system_prompt: Optional[str]
+    max_artifact_chars: Optional[int]  # лимит символов контекста (для Ollama меньше)
 
     # After analysis
     analysis: str

@@ -1,6 +1,6 @@
 """PostgreSQL models for projects, tests, artifacts, reports."""
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, Enum as SQLEnum, JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -54,7 +54,7 @@ class Project(Base):
 
     # LLM для агента
     llm_type: Mapped[str] = mapped_column(String(32), default=LLMType.ollama.value)
-    llm_model: Mapped[str] = mapped_column(String(128), default="qwen2.5vl:7b")
+    llm_model: Mapped[str] = mapped_column(String(128), default="qwen2.5:7b")
     llm_api_key: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -109,6 +109,8 @@ class Report(Base):
 
     report_text: Mapped[str] = mapped_column(Text, nullable=False)
     pdf_path: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    # Снимок списка артефактов на момент формирования отчёта (id, kind, display_name, file_path)
+    artifacts_used_snapshot: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
