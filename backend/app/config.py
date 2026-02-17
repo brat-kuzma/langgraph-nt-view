@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     # Ограничение контекста для Ollama (500 при переполнении). ~32k токенов ≈ 35k символов.
     ollama_max_context_chars: int = 35_000
+    # num_ctx — размер окна контекста Ollama в токенах. По умолчанию 4096, промпт обрезается. Qwen2.5 поддерживает 32768.
+    ollama_num_ctx: int = 32_768
 
     def artifacts_path(self) -> Path:
         return self.storage_path / self.artifacts_dir_name

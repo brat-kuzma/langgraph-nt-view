@@ -3,6 +3,7 @@ from typing import Optional
 
 from langchain_core.language_models import BaseChatModel
 
+from app.config import settings
 from app.db.models import LLMType
 
 
@@ -18,10 +19,12 @@ def get_llm(
     """
     if llm_type == LLMType.ollama.value:
         from langchain_community.chat_models import ChatOllama
+        # num_ctx: контекст по умолчанию 4096 — промпт 18k+ обрезается. Qwen2.5 поддерживает 32k.
         return ChatOllama(
             model=model or "qwen2.5:7b",
             base_url=base_url or "http://localhost:11434",
             temperature=0.2,
+            num_ctx=settings.ollama_num_ctx,
         )
     if llm_type == LLMType.gigachat.value:
         try:
