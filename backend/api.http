@@ -4,7 +4,7 @@
 
 @baseUrl = http://localhost:8000
 @projectId = 1
-@testId = 1
+@testId = 4
 
 ### ========== Health ==========
 GET {{baseUrl}}/health
@@ -139,6 +139,44 @@ Content-Type: text/plain
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ### Виды kind: custom_java_log | custom_gc | custom_thread_dump | custom_heap_dump | custom_jvm_opts | custom_jfr | custom_other
+
+### Загрузка картинки для анализа (скриншот: runaway pod)
+POST {{baseUrl}}/api/artifacts/test/{{testId}}/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="kind"
+
+custom_other
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="display_name"
+
+screenshot-runaway-pod.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="screenshot-runaway-pod.png"
+Content-Type: image/png
+
+< ./screenshot-runaway-pod.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Загрузка картинки для анализа (скриншот: container 30-day more req needed)
+POST {{baseUrl}}/api/artifacts/test/{{testId}}/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="kind"
+
+custom_other
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="display_name"
+
+screenshot-container-30-day-more-req-needed.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="screenshot-container-30-day-more-req-needed.png"
+Content-Type: image/png
+
+< ./screenshot-container-30-day-more-req-needed.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ### Скачать все артефакты теста (ZIP)
 GET {{baseUrl}}/api/artifacts/download-all/{{testId}}

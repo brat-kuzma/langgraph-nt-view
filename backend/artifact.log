@@ -1,0 +1,4 @@
+# Тестовый артефакт для api.http (upload)
+2025-02-15 10:00:00 INFO  Application started
+2025-02-15 10:01:00 INFO  GC pause 12ms
+2025-02-15 10:02:00 WARN  High memory usage 85%
