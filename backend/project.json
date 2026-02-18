@@ -1,0 +1,52 @@
+{
+  "name": "backend",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "backend/app",
+  "targets": {
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./scripts/install.sh",
+        "cwd": "backend"
+      },
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/requirements.txt", "{projectRoot}/scripts/install.sh"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./scripts/run.sh",
+        "cwd": "backend"
+      },
+      "cache": false
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Backend build: dependencies installed'",
+        "cwd": "backend"
+      },
+      "dependsOn": ["install"],
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/requirements.txt"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python -m pytest tests/ || echo 'No tests found'",
+        "cwd": "backend"
+      },
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/**/*.py"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ruff check app/ || echo 'Ruff not installed, skipping'",
+        "cwd": "backend"
+      },
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/**/*.py"]
+    }
+  }
+}

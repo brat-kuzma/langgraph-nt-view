@@ -26,3 +26,8 @@ backend/*.db
 # OS
 .DS_Store
 Thumbs.db
+
+# NX
+.nx/
+.nx/cache/
+node_modules/

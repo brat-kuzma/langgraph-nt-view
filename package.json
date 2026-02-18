@@ -1,0 +1,21 @@
+{
+  "name": "langgraph-nt-view",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LangGraph NT View - монорепозиторий для анализа результатов нагрузочного тестирования",
+  "scripts": {
+    "nx": "nx",
+    "build": "nx run-many --target=build --all",
+    "build:backend": "nx run backend:build",
+    "build:frontend": "nx run frontend:build",
+    "serve:backend": "nx run backend:serve",
+    "serve:frontend": "nx run frontend:serve",
+    "install:all": "nx run-many --target=install --all",
+    "test:all": "nx run-many --target=test --all",
+    "lint:all": "nx run-many --target=lint --all",
+    "reset": "nx reset"
+  },
+  "devDependencies": {
+    "nx": "^20.0.0"
+  }
+}

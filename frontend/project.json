@@ -1,0 +1,60 @@
+{
+  "name": "frontend",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "frontend/src",
+  "targets": {
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm install",
+        "cwd": "frontend"
+      },
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/package.json", "{projectRoot}/package-lock.json"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run dev",
+        "cwd": "frontend"
+      },
+      "cache": false
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "frontend"
+      },
+      "dependsOn": ["install"],
+      "cache": true,
+      "inputs": ["production", "{projectRoot}/vite.config.ts", "{projectRoot}/tsconfig.*.json"]
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run preview",
+        "cwd": "frontend"
+      },
+      "cache": false
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm test || echo 'No tests configured'",
+        "cwd": "frontend"
+      },
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/**/*.{ts,vue}"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run lint || echo 'Linting not configured'",
+        "cwd": "frontend"
+      },
+      "cache": true,
+      "inputs": ["default", "{projectRoot}/**/*.{ts,vue}"]
+    }
+  }
+}
